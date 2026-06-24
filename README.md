@@ -18,7 +18,7 @@ I'm as comfortable modeling a thermal or dynamic system as I am training a reinf
 
 ### 📫 Find me
 
-[LinkedIn](https://linkedin.com/in/DEIN-PROFIL)
+[LinkedIn](https://www.linkedin.com/in/florian-grassl-190463386/)
 
 ---
 
