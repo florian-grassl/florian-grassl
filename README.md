@@ -1,8 +1,8 @@
 # Hi, I'm Florian 👋
 
-ML/AI Engineer building **autonomous agents**, **reinforcement learning** systems, and **applied research tooling**.
+**Mechanical Engineer specializing in ML and AI**, bridging physical-systems engineering with machine learning.
 
-I'm drawn to systems that operate on their own: agents that research around the clock, and RL policies that learn to act under uncertainty.
+I'm as comfortable modeling a thermal or dynamic system as I am training a reinforcement learning policy or building an autonomous agent. I like systems that operate on their own: agents that research around the clock, and RL policies that learn to act under uncertainty.
 
 ### 🔭 Currently building
 
@@ -12,7 +12,9 @@ I'm drawn to systems that operate on their own: agents that research around the 
 
 ### 🛠 Tools I reach for
 
-`Python` · `PyTorch` · `JAX / Flax` · `Stable-Baselines3` · `Qdrant` · `CUDA` · `SwiftUI`
+**ML / AI:** `Python` · `PyTorch` · `JAX / Flax` · `Stable-Baselines3` · `Qdrant` · `CUDA`
+**Engineering:** `physical-systems modeling` · `thermodynamics` · `numerical methods` · `MATLAB`
+**Also:** `SwiftUI`
 
 ### 📫 Find me
 
