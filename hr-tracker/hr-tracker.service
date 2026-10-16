@@ -1,0 +1,11 @@
+[Unit]
+Description=Handelsregister-Tracker (einmalige Prüfung)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+DynamicUser=yes
+StateDirectory=hr-tracker
+EnvironmentFile=/etc/hr-tracker.env
+ExecStart=/opt/hr-tracker/venv/bin/python /opt/hr-tracker/hr_tracker.py
