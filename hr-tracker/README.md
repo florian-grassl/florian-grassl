@@ -44,5 +44,5 @@ Alternativ per Cron: `0 */4 * * * set -a; . /etc/hr-tracker.env; /opt/hr-tracker
 ## Hinweise
 
 - Bereits gemeldete Registernummern stehen in `state.json`; zum erneuten Melden die Datei löschen.
-- Für eine weitere Firma: zweite Env-Datei + eigene Service-Unit mit eigenem `STATE_FILE`.
+- Mehrere Firmen: in `HR_SEARCH` mit `;` trennen; alle werden im selben Lauf geprüft.
 - Das Portal erlaubt max. 60 Abfragen/Stunde; der Tracker macht eine Suche alle 4 Stunden.

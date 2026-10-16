@@ -162,40 +162,46 @@ def main():
         print("Testnachricht gesendet.")
         return
 
-    term = env("HR_SEARCH", required=True)
+    # Mehrere Firmen mit ";" trennen, z. B. "AnOtterInvest;Faroca Ventures"
+    terms = [t.strip() for t in env("HR_SEARCH", required=True).split(";") if t.strip()]
     mode = env("HR_SEARCH_MODE", "all")
     if mode not in SEARCH_MODES:
         sys.exit(f"HR_SEARCH_MODE muss eines von {', '.join(SEARCH_MODES)} sein")
-    name_filter = env("HR_NAME_CONTAINS", "")
     seat_filter = env("HR_SITZ", "")
     alert_after = int(env("FAILURE_ALERT_AFTER", "3"))
     state_path = Path(env("STATE_FILE", "/var/lib/hr-tracker/state.json"))
     state = load_state(state_path)
 
-    try:
-        results = search_with_retry(term, mode)
-    except Exception as exc:
-        print(f"Suche fehlgeschlagen: {exc}", file=sys.stderr)
-        if args.dry_run:
-            sys.exit(1)
+    hits, errors = [], []
+    for i, term in enumerate(terms):
+        if i:
+            time.sleep(5)  # Portal schonen
+        try:
+            results = search_with_retry(term, mode)
+        except Exception as exc:
+            print(f"Suche nach „{term}“ fehlgeschlagen: {exc}", file=sys.stderr)
+            errors.append(f"{term}: {exc}")
+            continue
+        # Treffer müssen den Suchbegriff im Namen enthalten (filtert Beifang des Portals)
+        found = [r for r in results if matches(r, term, seat_filter)]
+        print(f"{len(results)} Ergebnis(se) für „{term}“, davon {len(found)} passend.")
+        for h in found:
+            print(f"  {h['name']} | {h['sitz']} | {h['register']} | {h['status']}")
+        hits.extend(found)
+    if args.dry_run:
+        sys.exit(1 if errors else 0)
+
+    if errors:
         state["failures"] = state.get("failures", 0) + 1
         if state["failures"] == alert_after:
             notify("HR-Tracker: Abfrage schlägt fehl",
-                   f"Die Suche nach „{term}“ ist {alert_after}× in Folge fehlgeschlagen.\n"
-                   f"Letzter Fehler: {exc}", priority="low", tags=["warning"])
-        save_state(state_path, state)
-        sys.exit(1)
-
-    hits = [r for r in results if matches(r, name_filter, seat_filter)]
-    print(f"{len(results)} Ergebnis(se) für „{term}“, davon {len(hits)} passend.")
-    for h in hits:
-        print(f"  {h['name']} | {h['sitz']} | {h['register']} | {h['status']}")
-    if args.dry_run:
-        return
-
-    if state.get("failures", 0) >= alert_after:
-        notify("HR-Tracker: wieder in Ordnung", f"Die Suche nach „{term}“ läuft wieder.", priority="low", tags=["white_check_mark"])
-    state["failures"] = 0
+                   f"Die Suche ist {alert_after}× in Folge fehlgeschlagen.\n" + "\n".join(errors),
+                   priority="low", tags=["warning"])
+    else:
+        if state.get("failures", 0) >= alert_after:
+            notify("HR-Tracker: wieder in Ordnung", "Die Suche läuft wieder.",
+                   priority="low", tags=["white_check_mark"])
+        state["failures"] = 0
 
     new = [h for h in hits if h["register"] not in state["notified"]]
     if new:
@@ -206,6 +212,8 @@ def main():
         state["notified"].extend(h["register"] for h in new)
         print(f"Benachrichtigung für {len(new)} neue(n) Treffer gesendet.")
     save_state(state_path, state)
+    if errors:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
